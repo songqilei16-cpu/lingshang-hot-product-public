@@ -1,0 +1,29 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120" width="120" height="120">
+  <defs>
+    <linearGradient id="gSq" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#A870FF" stop-opacity="0.92"/>
+      <stop offset="50%" stop-color="#6F8BFF" stop-opacity="0.72"/>
+      <stop offset="100%" stop-color="#7AF3F8" stop-opacity="0.92"/>
+    </linearGradient>
+    <linearGradient id="gDm" x1="15%" y1="0%" x2="85%" y2="100%">
+      <stop offset="0%" stop-color="#D5B8FF" stop-opacity="0.78"/>
+      <stop offset="50%" stop-color="#7EA6FF" stop-opacity="0.46"/>
+      <stop offset="100%" stop-color="#8DF8FF" stop-opacity="0.82"/>
+    </linearGradient>
+    <linearGradient id="gCore" x1="10%" y1="15%" x2="90%" y2="85%">
+      <stop offset="0%" stop-color="#3E49FF" stop-opacity="0.96"/>
+      <stop offset="50%" stop-color="#205BFF" stop-opacity="0.96"/>
+      <stop offset="100%" stop-color="#349EFF" stop-opacity="0.94"/>
+    </linearGradient>
+  </defs>
+  <g transform="translate(60,60)">
+    <rect x="-36" y="-36" width="72" height="72" rx="14" fill="url(#gSq)"/>
+    <g transform="rotate(45)">
+      <rect x="-36" y="-36" width="72" height="72" rx="14" fill="url(#gDm)" stroke="#B5D0FF" stroke-opacity="0.65" stroke-width="1"/>
+    </g>
+    <g transform="rotate(45)">
+      <rect x="-25" y="-25" width="50" height="50" rx="11" fill="url(#gCore)"/>
+    </g>
+    <path d="M 0 -21 C 1.5 -7, 7 -1.5, 20 0 C 7 1.5, 1.5 7, 0 21 C -1.5 7, -7 1.5, -20 0 C -7 -1.5, -1.5 -7, 0 -21 Z" fill="#FFFFFF"/>
+  </g>
+</svg>

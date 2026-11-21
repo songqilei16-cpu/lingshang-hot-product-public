@@ -1,0 +1,406 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>领商 - 爆品生成</title>
+  <link rel="icon" type="image/svg+xml" href="./assets/logo.svg">
+  <link rel="stylesheet" href="./styles.css">
+</head>
+<body>
+  <!-- 顶部浮动提示 Toast -->
+  <div id="toastContainer" class="toast-container" aria-live="polite"></div>
+
+  <!-- 顶部导航栏 -->
+  <header class="top-header">
+    <div class="header-left">
+      <a href="javascript:void(0)" class="brand-logo" title="领商商家工作台">
+        <img src="./assets/logo.svg" alt="领商" class="brand-icon">
+        <span class="brand-name">领商</span>
+      </a>
+      <div class="global-search">
+        <svg class="search-icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5">
+          <circle cx="7.2" cy="7.2" r="5"/>
+          <path d="M11 11l3 3" stroke-linecap="round"/>
+        </svg>
+        <input type="text" id="globalSearchInput" placeholder="请输入搜索内容" autocomplete="off">
+      </div>
+    </div>
+
+    <div class="header-right">
+      <button class="icon-btn" title="切换语言" data-tip="当前语言：简体中文">
+        <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5">
+          <circle cx="10" cy="10" r="7.2"/>
+          <ellipse cx="10" cy="10" rx="3.4" ry="7.2"/>
+          <path d="M3.2 7.5h13.6M3.2 12.5h13.6"/>
+        </svg>
+      </button>
+      <button class="icon-btn has-badge" title="待办消息" data-tip="您有 2 条新的爆品审核通知">
+        <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5">
+          <rect x="4" y="3.5" width="12" height="13" rx="1.5"/>
+          <path d="M7 7.5h6M7 10.5h6M7 13.5h3.5" stroke-linecap="round"/>
+        </svg>
+        <span class="badge">2</span>
+      </button>
+      <button class="icon-btn" title="站内信" data-tip="暂无未读站内信">
+        <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5">
+          <rect x="3" y="4.5" width="14" height="11" rx="1.5"/>
+          <path d="M3.5 5.5l6.5 5 6.5-5"/>
+        </svg>
+      </button>
+      <button class="icon-btn" title="开发者中心" data-tip="领商开放平台 API 状态正常">
+        <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5">
+          <path d="M7.5 15.8c-2.8.8-2.8-1.4-4-1.8m8 3.2v-2.4c0-.7-.2-1.3-.6-1.7 2-.2 4.1-1 4.1-4.5 0-1-.3-1.8-.9-2.4.1-.2.4-1.2-.1-2.4 0 0-.8-.2-2.5.9a8.5 8.5 0 0 0-4.6 0C5.2 3.6 4.4 3.8 4.4 3.8c-.5 1.2-.2 2.2-.1 2.4-.6.6-.9 1.4-.9 2.4 0 3.5 2.1 4.3 4.1 4.5-.4.4-.6 1-.6 1.7v2.4" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </button>
+      <button class="icon-btn" title="帮助中心" data-tip="提示：输入爆款链接并关联商品后，可一键校验并下载爆品方案">
+        <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5">
+          <circle cx="10" cy="10" r="7.2"/>
+          <path d="M8 7.8a2.1 2.1 0 0 1 3.9 1c0 1.4-1.9 1.6-1.9 2.9" stroke-linecap="round"/>
+          <circle cx="10" cy="14.2" r="0.6" fill="currentColor" stroke="none"/>
+        </svg>
+      </button>
+      <div class="user-menu" id="userMenuBtn" title="账号信息">
+        <svg class="user-avatar-icon" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5">
+          <circle cx="10" cy="10" r="7.5"/>
+          <circle cx="10" cy="8" r="2.5"/>
+          <path d="M5.5 15.6a5 5 0 0 1 9 0" stroke-linecap="round"/>
+        </svg>
+        <span class="user-name">运营小二</span>
+        <svg class="chevron-sm" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.5">
+          <path d="M3 4.5L6 7.5L9 4.5" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </div>
+      <button class="icon-btn" title="系统设置" data-tip="系统版本 v2.4.0 · 已连接规则校验引擎">
+        <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5">
+          <path d="M10 3.2l5.8 3.4v6.8L10 16.8l-5.8-3.4V6.6L10 3.2z"/>
+          <circle cx="10" cy="10" r="2.2"/>
+        </svg>
+      </button>
+    </div>
+  </header>
+
+  <!-- 主体容器 -->
+  <div class="app-body">
+    <!-- 左侧菜单栏 -->
+    <aside class="sidebar" id="sidebar">
+      <nav class="sidebar-nav">
+        <div class="nav-group">
+          <button class="nav-item" data-menu="home">
+            <span class="nav-left">
+              <img src="./assets/nav-home.png" alt="首页" class="nav-icon-img">
+              <span class="nav-label">首页</span>
+            </span>
+            <svg class="nav-arrow" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M3 4.5L6 7.5L9 4.5" stroke-linecap="round"/></svg>
+          </button>
+        </div>
+
+        <div class="nav-group expanded">
+          <button class="nav-item active-parent" data-menu="products">
+            <span class="nav-left">
+              <img src="./assets/nav-product.png" alt="商品" class="nav-icon-img">
+              <span class="nav-label">商品</span>
+            </span>
+            <svg class="nav-arrow" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M3 4.5L6 7.5L9 4.5" stroke-linecap="round"/></svg>
+          </button>
+          <div class="nav-submenu">
+            <a href="javascript:void(0)" class="sub-item" data-page="我的商品">我的商品</a>
+            <a href="javascript:void(0)" class="sub-item" data-page="SKU管理">SKU管理</a>
+            <a href="javascript:void(0)" class="sub-item" data-page="商品质量得分">商品质量得分</a>
+            <a href="javascript:void(0)" class="sub-item" data-page="商品装修">商品装修</a>
+            <a href="javascript:void(0)" class="sub-item active" data-page="爆品运营">爆品运营</a>
+          </div>
+        </div>
+
+        <div class="nav-group">
+          <button class="nav-item" data-menu="trade">
+            <span class="nav-left">
+              <img src="./assets/nav-trade.png" alt="交易" class="nav-icon-img">
+              <span class="nav-label">交易</span>
+            </span>
+            <svg class="nav-arrow" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M3 4.5L6 7.5L9 4.5" stroke-linecap="round"/></svg>
+          </button>
+        </div>
+
+        <div class="nav-group">
+          <button class="nav-item" data-menu="marketing">
+            <span class="nav-left">
+              <img src="./assets/nav-marketing.png" alt="营销" class="nav-icon-img">
+              <span class="nav-label">营销</span>
+            </span>
+            <svg class="nav-arrow" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M3 4.5L6 7.5L9 4.5" stroke-linecap="round"/></svg>
+          </button>
+        </div>
+
+        <div class="nav-group">
+          <button class="nav-item" data-menu="promotion">
+            <span class="nav-left">
+              <img src="./assets/nav-promotion.png" alt="推广" class="nav-icon-img">
+              <span class="nav-label">推广</span>
+            </span>
+            <svg class="nav-arrow" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M3 4.5L6 7.5L9 4.5" stroke-linecap="round"/></svg>
+          </button>
+        </div>
+
+        <div class="nav-group">
+          <button class="nav-item" data-menu="service">
+            <span class="nav-left">
+              <img src="./assets/nav-service.png" alt="客服" class="nav-icon-img">
+              <span class="nav-label">客服</span>
+            </span>
+            <svg class="nav-arrow" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M3 4.5L6 7.5L9 4.5" stroke-linecap="round"/></svg>
+          </button>
+        </div>
+
+        <div class="nav-group">
+          <button class="nav-item" data-menu="shop">
+            <span class="nav-left">
+              <img src="./assets/nav-shop.png" alt="店铺" class="nav-icon-img">
+              <span class="nav-label">店铺</span>
+            </span>
+            <svg class="nav-arrow" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M3 4.5L6 7.5L9 4.5" stroke-linecap="round"/></svg>
+          </button>
+        </div>
+
+        <div class="nav-group">
+          <button class="nav-item" data-menu="private">
+            <span class="nav-left">
+              <img src="./assets/nav-private.png" alt="私域" class="nav-icon-img">
+              <span class="nav-label">私域</span>
+            </span>
+            <svg class="nav-arrow" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M3 4.5L6 7.5L9 4.5" stroke-linecap="round"/></svg>
+          </button>
+        </div>
+
+        <div class="nav-group">
+          <button class="nav-item" data-menu="finance">
+            <span class="nav-left">
+              <img src="./assets/nav-finance.png" alt="财务" class="nav-icon-img">
+              <span class="nav-label">财务</span>
+            </span>
+            <svg class="nav-arrow" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M3 4.5L6 7.5L9 4.5" stroke-linecap="round"/></svg>
+          </button>
+        </div>
+      </nav>
+
+      <div class="sidebar-footer">
+        <button class="collapse-btn" id="sidebarToggle" title="收起/展开侧边栏">
+          <svg viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.5">
+            <path d="M3 5h12M3 9h12M3 13h12" stroke-linecap="round"/>
+          </svg>
+        </button>
+      </div>
+    </aside>
+
+    <!-- 右侧主工作区 -->
+    <main class="main-content">
+      <section class="workspace-card">
+        <div class="card-body">
+          <!-- 面包屑（使用设计稿同款线条右箭头图标） -->
+          <div class="breadcrumb">
+            <span class="crumb-muted">商品</span>
+            <svg class="crumb-sep-icon" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <path d="M4.2 2.4L7.8 6L4.2 9.6"/>
+            </svg>
+            <span class="crumb-muted">爆品运营</span>
+            <svg class="crumb-sep-icon" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <path d="M4.2 2.4L7.8 6L4.2 9.6"/>
+            </svg>
+            <span class="crumb-current">爆品生成</span>
+          </div>
+
+          <!-- 左右两栏核心区域 -->
+          <div class="generator-layout">
+            <!-- 左栏：移动端商品详情静态示意样机（纯静态展示标题位置，不与右侧表单联动） -->
+            <div class="phone-preview-col">
+              <div class="phone-frame">
+                <img src="./assets/phone-mockup.png" alt="移动端商品详情预览" class="phone-mockup-img">
+              </div>
+            </div>
+
+            <!-- 右栏：表单与交互区域 -->
+            <div class="form-col">
+              <!-- 1. 关联商品 -->
+              <div class="form-row">
+                <label class="form-label">
+                  <span class="required">*</span>关联商品
+                </label>
+                <div class="form-control">
+                  <button type="button" id="selectProductsBtn" class="btn-outline">
+                    + 选择商品 (<span id="selectedCountText">0</span>/100)
+                  </button>
+
+                  <!-- 交互规则：选中商品后才显示商品表格与分页器（容器 4 -> 容器 5） -->
+                  <div id="productTableSection" class="table-section hidden">
+                    <div class="table-wrapper">
+                      <table class="data-table">
+                        <thead>
+                          <tr>
+                            <th class="col-check">
+                              <input type="checkbox" id="tableSelectAll" aria-label="全选当前页">
+                            </th>
+                            <th>商品名称</th>
+                            <th>颜色</th>
+                            <th>重量</th>
+                            <th>价格</th>
+                            <th>外包装形状</th>
+                          </tr>
+                        </thead>
+                        <tbody id="productTableBody"></tbody>
+                      </table>
+                    </div>
+
+                    <div class="pagination-bar">
+                      <div class="pagination-total">共 <span id="tableTotalCount">0</span> 项数据</div>
+                      <div class="pagination-controls">
+                        <div class="page-size-wrap">
+                          <select id="pageSizeSelect" class="page-size-select" aria-label="每页条数">
+                            <option value="3" selected>3 条/页</option>
+                            <option value="5">5 条/页</option>
+                            <option value="10">10 条/页</option>
+                          </select>
+                          <svg class="select-chevron" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M2.8 4.4L6 7.6L9.2 4.4"/>
+                          </svg>
+                        </div>
+                        <button type="button" id="prevPageBtn" class="page-btn page-nav-btn" aria-label="上一页">
+                          <svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M7.6 2.6L4.2 6L7.6 9.4"/>
+                          </svg>
+                        </button>
+                        <div id="pageNumbers" class="page-numbers"></div>
+                        <button type="button" id="nextPageBtn" class="page-btn page-nav-btn" aria-label="下一页">
+                          <svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M4.4 2.6L7.8 6L4.4 9.4"/>
+                          </svg>
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- 2. 爆款链接 -->
+              <div class="form-row">
+                <label class="form-label" for="hotLinkInput">
+                  <span class="required">*</span>爆款链接
+                </label>
+                <div class="form-control">
+                  <div class="link-input-group">
+                    <input
+                      type="text"
+                      id="hotLinkInput"
+                      class="text-input"
+                      placeholder="请输入爆款链接"
+                      list="sampleLinks"
+                      autocomplete="off"
+                    >
+                    <datalist id="sampleLinks">
+                      <option value="https://qn.taobao.com/home.htm/mkt-shop/match-buy/create/pc?isFullWidth=true">
+                    </datalist>
+                    <!-- 识别按钮常驻显示 -->
+                    <button type="button" id="recognizeBtn" class="btn-primary recognize-btn">
+                      <svg class="btn-icon eye-icon" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M2.2 10C3.9 6.6 6.6 4.8 10 4.8s6.1 1.8 7.8 5.2c-1.7 3.4-4.4 5.2-7.8 5.2S3.9 13.4 2.2 10Z"/>
+                        <circle cx="10" cy="10" r="2.6"/>
+                      </svg>
+                      <span class="btn-text">识别</span>
+                    </button>
+                  </div>
+                </div>
+              </div>
+
+              <!-- 3. 标题预览 -->
+              <div class="form-row">
+                <label class="form-label" for="titlePreviewInput">
+                  <span class="required">*</span>标题预览
+                </label>
+                <div class="form-control">
+                  <div class="textarea-wrapper" id="titleTextareaWrapper">
+                    <textarea
+                      id="titlePreviewInput"
+                      class="title-textarea"
+                      maxlength="150"
+                      rows="4"
+                      placeholder="填写爆款链接和关联商品后方可预览标题"
+                    ></textarea>
+                    <span class="char-counter" id="charCounter">0/150</span>
+                  </div>
+
+                  <!-- 校验失败提示（容器 7） -->
+                  <div id="titleErrorMsg" class="error-message hidden">
+                    不符合平台规则，请重新生成或修改！
+                  </div>
+
+                  <!-- AI 重新生成提示条（容器 5/6/7：完全还原设计稿原图标与紫蓝青渐变边框） -->
+                  <div id="aiRegenerateBar" class="ai-banner hidden">
+                    <div class="ai-banner-left">
+                      <img src="./assets/ai-banner-icon.png" alt="AI" class="ai-mini-icon">
+                      <span>若对Ai生成爆款标题不满意，可重新生成</span>
+                    </div>
+                    <button type="button" id="regenerateBtn" class="ai-regen-btn">
+                      <span class="regen-text">重新生成</span>
+                      <svg class="regen-icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5">
+                        <path d="M13.2 8a5.2 5.2 0 1 1-1.3-3.4" stroke-linecap="round"/>
+                        <path d="M13.2 3.2v2.6h-2.6" stroke-linecap="round" stroke-linejoin="round"/>
+                      </svg>
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 底部操作栏 -->
+        <div class="card-footer">
+          <button type="button" id="submitDownloadBtn" class="btn-primary btn-lg">校验并下载</button>
+          <button type="button" id="cancelBtn" class="btn-outline btn-lg">取消</button>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <!-- 选择商品弹窗 -->
+  <div id="productModal" class="modal-backdrop hidden" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+    <div class="modal-dialog">
+      <div class="modal-header">
+        <h2 id="modalTitle">选择关联商品 <span class="modal-sub">(最多可选 100 件)</span></h2>
+        <button type="button" id="closeModalBtn" class="modal-close" aria-label="关闭">&times;</button>
+      </div>
+      <div class="modal-toolbar">
+        <input type="text" id="modalSearchInput" class="text-input modal-search" placeholder="搜索商品名称、颜色...">
+      </div>
+      <div class="modal-body">
+        <div class="table-wrapper">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th class="col-check">
+                  <input type="checkbox" id="modalHeaderCheck" aria-label="全选">
+                </th>
+                <th>商品名称</th>
+                <th>颜色</th>
+                <th>重量</th>
+                <th>价格</th>
+                <th>外包装形状</th>
+              </tr>
+            </thead>
+            <tbody id="modalProductList"></tbody>
+          </table>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <span class="modal-count">已选择 <strong id="modalSelectedCount">0</strong> / 100 件商品</span>
+        <div class="modal-footer-btns">
+          <button type="button" id="modalCancelBtn" class="btn-outline">取消</button>
+          <button type="button" id="modalConfirmBtn" class="btn-primary">确定</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="./api.js"></script>
+  <script src="./app.js"></script>
+</body>
+</html>
